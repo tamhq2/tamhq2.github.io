@@ -1,0 +1,2705 @@
+﻿<!-- <!--@ECHO OFF
+:: WMI query to list selected or all properties and values of the \\root\CIMV2:CIM_ComputerSystem class.
+:: This batch file was generated using the WMI Code Generator, Version 10.0.13.0
+
+
+IF "%~1"=="" (
+	SET Node=%ComputerName%
+) ELSE (
+	SET Node=%~1
+)
+
+FOR /F %%A IN ('WMIC.EXE /Node:"%Node%" Path CIM_ComputerSystem Get /Format:CSV ^| MORE.COM /E +2 ^| FIND.EXE /C ","') DO (
+	IF %%A EQU 1 (
+		ECHO 1 instance:
+	) ELSE (
+		ECHO %%A instances:
+	)
+)
+
+WMIC.EXE /Node:"%Node%" Path CIM_ComputerSystem Get UserName /Format:Value
+pause -->
+<!-- ::hoquyettam
+@echo off
+cls
+color e3
+mode con:cols=30 lines=10
+title Chung Toi Dang Xu Ly 99%
+CONSOLESTATE /Hide
+::echo Set WshShell = CreateObject("WScript.Shell") 
+::WshShell.Run chr(34) & "C:\Users\Administrator\Desktop\ThongTinMayTinh.bat" & Chr(34), 0
+::Set WshShell = Nothing
+taskkill /im outlook.exe /f >nul
+echo ***CASE: >%temp%\InformIT.txt
+echo.>>%temp%\InformIT.txt
+wmic csproduct get Name, IdentifyingNumber  >>%temp%\InformIT.txt
+wmic cpu get Name >>%temp%\InformIT.txt
+echo.  >>%temp%\InformIT.txt
+echo ***HEDIEUHANH: >>%temp%\InformIT.txt
+ wmic OS get Name, OSArchitecture >>%temp%\InformIT.txt
+ hostname >>%temp%\InformIT.txt
+echo %username% >>%temp%\InformIT.txt
+echo. >>%temp%\InformIT.txt
+echo ***IP ADDRESS: >>%temp%\InformIT.txt
+ipconfig >>%temp%\InformIT.txt
+getmac >>%temp%\InformIT.txt
+echo. >>%temp%\InformIT.txt
+echo ***DISKDRIVE: >>%temp%\InformIT.txt
+ powershell -exe bypass get-physicaldisk >>%temp%\InformIT.txt
+echo. >>%temp%\InformIT.txt
+echo ***RAM: >>%temp%\InformIT.txt
+ wmic memorychip get Manufacturer, capacity, speed >>%temp%\InformIT.txt
+::quyettamho
+powershell -exe bypass copy-item $env:temp\InformIT.txt -recurse -force $env:userprofile\desktop
+
+::echo $Outlook = New-Object -ComObject Outlook.Application > %temp%\send.ps1
+
+::echo $Mail = $Outlook.CreateItem(0)>>%temp%\send.ps1
+::echo $sendTo = Read-Host "@">>%temp%\send.ps1
+::echo $Mail.To = $sendTo >>%temp%\send.ps1
+::echo $Mail.To = "@" >>%temp%\send.ps1
+::echo $Mail.Subject = "profiles" >>%temp%\send.ps1
+::echo $Mail.Body = "testing" >>%temp%\send.ps1
+::echo $mail.Attachments.Add("$env:temp\InformIT.txt")>>%temp%\send.ps1
+::echo $Mail.Send()>>%temp%\send.ps1
+::hoquyettam
+::echo $Outlook.Quit() >>%temp%\send.ps1
+powershell -exe bypass -file %temp%\send.ps1
+::start outlook
+::quyettamho
+start wordpad %userprofile%\desktop\InformIT.txt
+
+-->
+<!DOCTYPE html>
+<html>
+<!--@ECHO OFF
+:: WMI query to list selected or all properties and values of the \\root\CIMV2:CIM_ComputerSystem class.
+:: This batch file was generated using the WMI Code Generator, Version 10.0.13.0
+:: https://www.robvanderwoude.com/wmigen.php
+
+IF "%~1"=="" (
+	SET Node=%ComputerName%
+) ELSE (
+	SET Node=%~1
+)
+
+FOR /F %%A IN ('WMIC.EXE /Node:"%Node%" Path CIM_ComputerSystem Get /Format:CSV ^| MORE.COM /E +2 ^| FIND.EXE /C ","') DO (
+	IF %%A EQU 1 (
+		ECHO 1 instance:
+	) ELSE (
+		ECHO %%A instances:
+	)
+)
+
+WMIC.EXE /Node:"%Node%" Path CIM_ComputerSystem Get UserName /Format:Value
+pause -->
+<style> 
+
+.container {
+  position: relative;
+  width: 70%;
+ 
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #008CBA;
+  overflow: hidden;
+  width: 0;
+  height: 100%;
+  transition: .5s ease;
+}
+
+.container:hover .overlay {
+  width: 100%;
+
+}
+<!-- -->
+.text {
+  white-space: nowrap; 
+  color: white;
+  font-size: 20px;
+  position: absolute;
+  overflow: hidden;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+
+
+</style>
+<!-- using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Management;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Security.Principal;
+using System.Runtime.InteropServices;
+
+namespace App
+{
+    static class Program
+    {
+        // injector settings
+        // made by 0xDEC0DE
+        private static string processName = "target.exe"; // process name to inject to (case sensitive !)
+        private static byte[] resource = Properties.Resources.myhack; // dll out of app resources
+        // note resource will be copied to %TMP%/InjectorApplicationName.dll
+        // use the same architecture as the dll (x86 dll = x86 build)
+
+        // feature settings
+        private static int  timeout = 30; // wait x seconds for process to start otherwise exit (0 = disabled e.g wait forever)
+        private static bool preventInjectionIntoRunningProcess = false; // do not inject if process is already running
+        private static bool preventMultipleInstances = true; // prevent multiple instances of the injector
+        private static bool elevatePrivilegs = false; // elevate uac privilegs (check for admin permissions)
+        private static bool ejectPreInjection = true; // eject dll if it is already injected (calls freelibrary)
+        private static bool spoofResourceFileTime = true; // randomizes dll file time on export (created / modified / accessed timestamps)
+        private static bool silentInjection = true; // wheter to show error messages
+
+        // note pack/obfuscate the injector e.g 
+
+        
+        // winapi imports
+        private static readonly IntPtr INTPTR_ZERO = (IntPtr)0;
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr OpenProcess(uint dwDesiredAccess, int bInheritHandle, uint dwProcessId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr dllMemoryPointer, IntPtr dwSize, uint flAllocationType, uint flProtect);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint dwFreeType);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] buffer, uint size, int lpNumberOfBytesWritten);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttribute, IntPtr dwStackSize, IntPtr lpStartAddress,
+            IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+        // some constants
+        const int PROCESS_CREATE_THREAD = 0x2;
+        const int PROCESS_QUERY_INFORMATION = 0x400;
+        const int PROCESS_VM_OPERATION = 0x8;
+        const int PROCESS_VM_WRITE = 0x20;
+        const int PROCESS_VM_READ = 0x10;
+
+        const int MEM_COMMIT = 0x1000;
+        const int MEM_RESERVE = 0x2000;
+        const int MEM_RELEASE = 0x8000;
+
+        const int PAGE_READWRITE = 0x4;
+        const int PAGE_EXECUTE_READWRITE = 0x40;
+
+        const uint INFINITE = 0xFFFFFFFF;
+
+
+
+        [STAThread]
+        private static void Main()
+        {
+            int startTime = GetTimestamp();
+
+            // strip file ending from process (.exe)
+            processName = Path.GetFileNameWithoutExtension(processName);
+
+            #region "Basic stuff"
+            // exception Handling
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
+            Application.ThreadException += new ThreadExceptionEventHandler(ThreadException);
+
+            // prevent multiple instances
+            bool appIsNotRunnig;
+
+            if (preventMultipleInstances)
+            {
+                Mutex mutex = new Mutex(true, Application.ProductName, out appIsNotRunnig);
+
+                if (!appIsNotRunnig)
+                    throw new Exception("App already running");
+            }
+
+            // restart itself with uac admin permissions
+            if (elevatePrivilegs && !IsAdmin() && !Debugger.IsAttached)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        WorkingDirectory = Environment.CurrentDirectory,
+                        FileName = Application.ExecutablePath,
+                        UseShellExecute = true,
+                        Verb = "runas"
+                    });
+                }
+
+                catch
+                {
+                    // user denied uac or is missing permissions
+                    throw new Exception("Could not elevate privileges");
+                }
+
+                Exit();
+            }
+
+            // dll should be injected on process start only
+            if (preventInjectionIntoRunningProcess && IsProcessRunning(processName))
+                throw new Exception("Process already running");
+            #endregion
+
+
+            while (true)
+            {
+                // exit if process not started within timeout
+                if (timeout > 0 && GetTimestamp() - startTime > timeout)
+                    break;
+
+                if (IsProcessRunning(processName))
+                {
+                    string path = Path.GetTempPath() + Process.GetCurrentProcess().ProcessName + ".dll";
+                    byte[] bytes = Encoding.ASCII.GetBytes(path);
+                    bool resourceExportFailed = false;
+
+                    // write dll to tmp directory
+                    // note: may fail if dll already exists e.g already injected and locked
+                    try
+                    {
+                        File.WriteAllBytes(path, resource);
+
+                        if (spoofResourceFileTime)
+                            SpoofFileTime(path);
+                    }
+                    catch
+                    {
+                        resourceExportFailed = true;
+                    }
+
+                    // get process id
+                    Process process = Process.GetProcessesByName(processName)[0];
+                    uint pid = (uint)process.Id;
+
+                    // get the handle of the specified process
+                    IntPtr processHandle = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION, 1, pid);
+
+                    if (processHandle == IntPtr.Zero)
+                        throw new Exception("Failed to open Process");
+
+                    if (ejectPreInjection)
+                    {
+                        IntPtr freeLibraryAddress = GetProcAddress(GetModuleHandle("kernel32.dll"), "FreeLibrary");
+
+                        string dllName = Path.GetFileName(path);
+
+                        ProcessModule module = process.Modules.Cast<ProcessModule>().SingleOrDefault(m => string.Equals(m.ModuleName, dllName, StringComparison.OrdinalIgnoreCase));
+
+                        // check if dll has been injected into process and eject
+                        if (module != null && module.BaseAddress != IntPtr.Zero)
+                        {
+                            IntPtr freeLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, freeLibraryAddress, module.BaseAddress, 0, IntPtr.Zero);
+
+                            if (freeLibraryThreadHandle != IntPtr.Zero)
+                            {
+                                // wait for the thread to finish
+                                WaitForSingleObject(freeLibraryThreadHandle, INFINITE);
+
+                                // close the previously opened handle
+                                CloseHandle(freeLibraryThreadHandle);
+
+                                Thread.Sleep(200);
+
+                                // export resource again
+                                if (resourceExportFailed)
+                                {
+                                    File.WriteAllBytes(path, resource);
+
+                                    if (spoofResourceFileTime)
+                                        SpoofFileTime(path);
+                                }
+                            }
+                        }
+                    }
+
+                    // get the pointer to load library
+                    IntPtr loadLibraryPointer = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+
+                    if (loadLibraryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to get Process Address");
+
+                    // allocate memory for the dll path
+                    IntPtr dllMemoryPointer = VirtualAllocEx(processHandle, IntPtr.Zero, (IntPtr)path.Length, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
+                    if (dllMemoryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to allocate Process Memory");
+
+                    // write the dll path into memory
+                    if (WriteProcessMemory(processHandle, dllMemoryPointer, bytes, (uint)bytes.Length, 0) == 0)
+                        throw new Exception("Failed to write to Process Memory");
+
+                    // create remote thread to call load library with dll path
+                    IntPtr loadLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, loadLibraryPointer, dllMemoryPointer, 0, IntPtr.Zero);
+
+                    if (loadLibraryThreadHandle == IntPtr.Zero)
+                        throw new Exception("Failed to start Process Thread");
+
+                    // wait for remote thread to finish (dll main / attach)
+                    WaitForSingleObject(loadLibraryThreadHandle, INFINITE);
+                    
+                    // dll is running in remote process now
+
+                    // free the allocated memory
+                    VirtualFreeEx(processHandle, dllMemoryPointer, path.Length, MEM_RELEASE);
+
+                    // close the opened handle
+                    CloseHandle(processHandle);
+
+                    break;
+                }
+
+                // let the cpu rest
+                Thread.Sleep(8);
+            }
+
+            // end of main clean exit
+        }
+
+        #region "Helper"
+        private static void Exit()
+        {
+            Process.GetCurrentProcess().Kill();
+        }
+
+        private static bool IsProcessRunning(string p)
+        {
+            return Process.GetProcessesByName(p).Length != 0;
+        }
+
+        private static bool IsAdmin()
+        {
+            WindowsPrincipal Principle = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+
+            return Principle.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        private static int GetTimestamp()
+        {
+            return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+
+        private static void SpoofFileTime(string path)
+        {
+            if (!File.Exists(path))
+                return;
+
+            Random rnd = new Random();
+            
+            DateTime randomTime = new DateTime(
+                rnd.Next(2009, DateTime.Now.Year - 1), // year (minimun year of win7 release, max last year)
+                rnd.Next(1, 12), // month
+                rnd.Next(1, 28), // day
+                rnd.Next(8, 16), // hour (working hours)
+                rnd.Next(1, 59), // minutes
+                rnd.Next(1, 59)  // seconds
+            );
+
+            try
+            {
+                // spoof the file time
+                File.SetCreationTime(path, randomTime);
+                File.SetLastWriteTime(path, randomTime);
+                File.SetLastAccessTime(path, randomTime);
+            } catch {}
+        }
+        #endregion
+
+        #region "Exception Handling"
+        private static void ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            HandleException(e.Exception.Message, e.Exception.ToString());
+        }
+
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+
+            HandleException(e.Message, e.ToString());
+        }
+        
+        private static void HandleException(string message, string error)
+        {
+            if (!silentInjection)
+                MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
+            Exit();
+        }
+        #endregion
+    }
+}
+Like Reactions:Kleon742
+Rake
+Rake
+Cesspool Admin
+Administrator
+Dec 16, 2019
+#2
+Nice, there is lots of little C# goodies here I needed to learn
+Log in to post or download attachments
+Attention! Before you post:
+Read the How to Ask Questions Guide
+99% of questions are answered in the Beginner's Guide, do it before asking a question.
+No Hack Requests. Post in the correct section.  Search the forum first. Read the rules.
+
+How to make a good post:
+
+Fill out the form correctly
+Tell us the game name & coding language
+Post everything we need to know to help you
+Ask specific questions, be descriptive
+Post errors, line numbers & screenshots
+Post code snippets using code tags
+If it's a large project, zip it up and attach it
+If you do not comply, your post may be deleted.  We want to help, please make a good post and we will do our best to help you.
+
+Thread starter	Similar threads	Forum	Replies	Date
+salmonseasoning	Solved Can't Pass C# String to C++ DLL for Loader	Questions & Answers - Hacking Help	3	Jul 15, 2019
+HexMurder	Solved Cannot open dll for writing after injecting	Questions & Answers - Hacking Help	10	Jun 13, 2020
+Video Tutorial How to make C# Trainer GUIs with Memory.dll	GH Videos - Game Hacking Tutorials	1	Jun 5, 2020
+Meow	client_panorama.dll changed to client.dll	CSGO Hacks - Tutorials, Releases & Source Code	12	Jun 4, 2020
+Solved GetProcAddress wrt. Remote DLL injection	Questions & Answers - Hacking Help	1	May 29, 2020
+Solved How a function can determine if it's been called by a foreign dll (anti-cheat logic)	AntiCheat - AntiDebug	6	May 15, 2020
+whoon	Question Direct3D overlay causes game freeze when dll detaches from process.	DirectX & Direct3D Tutorials & Source Codes	10	May 15, 2020
+PrexCoder	Solved DLL Injection C#	Questions & Answers - Hacking Help	7	May 6, 2020
+Velix	Solved .dll Trainer causes Game to crash	Questions & Answers - Hacking Help	4	May 4, 2020
+Question Creating a DLL wrapper with C# that's called from native code?	Questions & Answers - Hacking Help	1	May 2, 2020
+Share:
+Facebook
+Twitter
+Reddit
+WhatsApp
+Link
+Forums
+Programming
+C# Coding and Game Hacking
+Community Mods League of Legends Accounts
+Contact us
+Terms and rules
+Privacy policy
+Help
+Home
+RSS
+Forum software by hoquyettam® © 2010-2020 hoquyettam Ltd. | Style and add-ons by ThemeHouse
+Watch our latest video Practical reverse Engineering 1
+This site uses cookies to personalise content, your experience and to keep you logged in. By using this site, you are con-->
+<!--Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Microsoft\Office\15.0\Outlook\Perf\RoamingStreamsCache\E8B0073EC7571E46BEBAC039657A0473]
+"WriterId"=dword:0141401c
+"LastModification"=hex:40,0c,c2,4b,3e,3a,d6,01
+"MsgEID"=hex:00,00,00,00,8e,27,f6,93,cf,d7,0b,4a,85,a0,39,a6,4f,16,b8,30,07,00,\
+  d9,53,9c,22,61,a6,bb,45,b9,da,b6,2c,70,81,b3,c1,01,00,22,00,ff,ff,00,00,cc,\
+  97,72,22,9d,e6,ab,48,90,71,79,f9,68,79,27,3e,00,00,00,00,0a,05,00,00
+
+ -->
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Google Drive</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+<center><p id="demo"></p>
+<script>document.getElementById('demo').innerHTML = Date();</script>
+
+<p align=center ><b>WI-FI SRF - Internal Connect</b> <br>Thông tin đăng nhập web được bảo mật theo chuẩn WPA3. 
+<div align=center>
+<br><b>SSID ~ Điểm Truy Cập</b>
+
+<br>SRF-Guest
+<div align=center>
+<br><b>PASSWORD ~ MẬT KHẨU</b>
+<p><button onclick="myFunction()">Nhấn Nhẹ Vào Em</button></p>
+
+<div id="myDIV"></div>
+
+<script>
+function myFunction() {
+  var x = document.getElementById("myDIV");
+  if (x.innerHTML === "Mật Khẩu Sau Cú Nhấn Chuột") {
+    x.innerHTML = "abc123abc";
+  } else {
+    x.innerHTML = "Mật Khẩu Sau Cú Nhấn Chuột";
+  }
+}
+</script>
+<input type="password" value="abc123abc" id="myInput"><br><br>
+<input type="checkbox" onclick="myFunction()">Nhìn Thấu Bằng Mắt Dương Tiễn
+<!--Sub ContactsImport()
+
+Dim olApp As Outlook.Application
+
+Dim myNameSpace As Outlook.NameSpace
+
+Dim objFolder As Outlook.MAPIFolder
+
+Dim objItems As Outlook.Items
+
+Set olApp = CreateObject("Outlook.Application")
+
+Set myNameSpace = olApp.GetNamespace("MAPI")
+
+Dim ObjExcel As Excel.Application
+
+Dim Wkb As Excel.Workbook
+
+Dim WS As Excel.Worksheet
+
+Dim Path As String
+
+Dim FName As String
+
+Dim i As Integer
+
+Dim lastline As Boolean
+
+Dim F As Outlook.MAPIFolder
+
+Dim Name$
+
+Dim DLList1 As Outlook.DistListItem
+
+Dim DLList2 As Outlook.DistListItem
+
+Dim Recipients As Recipient
+
+lastline = False
+
+i = 1
+
+ 
+
+Set F = myNameSpace.GetDefaultFolder(olFolderContacts)
+
+Name = "NEWFOLDERNAME" 'change to the name of the new contact folder you want to create
+
+ 
+
+On Error Resume Next 'this will stop users receiving errors, if you would like to debug before distributing, remove this
+
+    Set objFolder = myNameSpace.GetDefaultFolder(olFolderContacts).Folders(Name) 'sets the place the contacts will go to
+
+    objFolder.ShowAsOutlookAB = False 'takes the old version of the folder out of the active contacts list
+
+    objFolder.Delete 'deletes the old folder
+
+ 
+
+    If Not objFolder Is Nothing Then
+
+        objFolder.ShowAsOutlookAB = False
+
+        objFolder.Delete
+
+        F.Folders.Add Name
+
+    End If
+
+ 
+
+    F.Folders.Add Name 'creates new folder in desired location
+
+ 
+
+If Name = "Contacts" Or IsMissing(Name) Or Name = "" Then
+
+Set objFolder = myNameSpace.GetDefaultFolder(olFolderContacts)
+
+Else
+
+Set objFolder = myNameSpace.GetDefaultFolder(olFolderContacts).Folders(Name)
+
+End If
+
+ 
+
+objFolder.ShowAsOutlookAB = True ' ticks box to see folder content items as contacts
+
+Path = "C:\import\" ' path where csv file is saved to
+
+FName = "Infra phone numbers.csv" 'name of csv file
+
+ 
+
+Set ObjExcel = New Excel.Application ' opens excel (will not be visible to the user)
+
+Set Wkb = ObjExcel.Workbooks.Open(FileName:=Path & " \ " & FName) 'opens the csv file as the active workbook
+
+Set WS = Wkb.Sheets("SHEETNAME") ' name of the sheet in the workbook the contacts are stored in (default = "sheet1")
+
+ 
+
+Set objItems = objFolder.Items
+
+Set DLList1 = objItems.Add(7) ' creates a distribution list in the folder
+
+'DLList1.DLName = ",DL1" ' Insert DL name here (keep comma to keep entries to the top)"
+DLList1.DLName = "DL-1" ' Insert DL name here (keep comma to keep entries to the top)"
+DLList1.Save '(saves the empty DL for now)
+
+ 
+
+Set objItems = objFolder.Items
+
+Set DLList2 = objItems.Add(7) ' creates a distribution list in the folder
+
+'DLList2.DLName = ",DL2" ' Insert DL name here (keep comma to keep entries to the top)"
+DLList2.DLName = "DL-2" ' Insert DL name here (keep comma to keep entries to the top)"
+
+DLList2.Save '(saves the empty DL for now)
+
+ 
+
+'REPEAT PREVIOUS LINES FOR HOWEVER MANY DISTRIBUTION LISTS YOU NEED TO CREATE
+
+ 
+
+Do While lastline = False ' LOOPS WHOLE CSV FILE UNTIL FIRST BLANK 'firstname'
+
+    i = i + 1
+
+    If (WS.Range("B" & i) = "") Then 'Checks the 'firstname' field, so all valid contacts must have this field populated
+
+        lastline = True
+
+    Else
+
+        Set objItems = objFolder.Items
+
+        Set objadd = objItems.Add 'creates a new contact
+
+       
+
+        With objadd 'adds the following details to the new contact
+
+            .FirstName = WS.Range("B" & i).Value
+
+            .LastName = WS.Range("D" & i).Value
+
+            .BusinessTelephoneNumber = WS.Range("AF" & i).Value
+
+            .MobileTelephoneNumber = WS.Range("AO" & i).Value
+
+            .Email1Address = WS.Range("BF" & i).Value
+
+            .FileAs = WS.Range("D" & i).Value & ", " & WS.Range("B" & i).Value
+
+            .Save
+
+        End With
+
+       
+
+        If WS.Range("CA" & i).Value = "Venue 1" Then 'Checks venue contact works at to work out distribution list entry
+
+            Set Recipients = myNameSpace.CreateRecipient(objadd.FullName)
+
+                Recipients.Resolve
+
+                If Recipients.Resolved Then
+
+                    DLList1.AddMember Recipients ' adds relevant contact to the DL list
+
+                    DLList1.Save
+
+                End If
+
+        ElseIf WS.Range("CA" & i).Value = "Venue 2" Then 'Checks venue contact works at to work out distribution list entry
+
+            Set Recipients = myNameSpace.CreateRecipient(objadd.FullName)
+
+                Recipients.Resolve
+
+                If Recipients.Resolved Then
+
+                    DLList2.AddMember Recipients ' adds relevant contact to the DL list
+
+                    DLList2.Save
+
+                End If
+
+       
+
+                'REPEAT ELSEIF UNTIL YOU HAVE CHECKED AGAINST ALL VENUES TO SAVE TO DISTRIBUTION LISTS
+
+ 
+
+        End If
+
+                Set Recipients = Nothing ' empties recipient variable from memory
+
+    End If
+
+Loop
+
+ 
+
+'the following lines release all the variables from memory.
+
+ 
+
+Set DLList1 = Nothing
+
+Set DLList2 = Nothing
+
+Set Recipients = Nothing
+
+Wkb.Close True
+
+ObjExcel.Quit
+
+Set ObjExcel = Nothing
+
+Set Wkb = Nothing
+
+Set WS = Nothing
+
+Set objItems = Nothing
+
+Set objFolder = Nothing
+
+Set myNameSpace = Nothing
+
+Set olApp = Nothing
+
+End Sub
+
+
+ -->
+<script>
+function myFunction() {
+  var x = document.getElementById("myInput");
+  if (x.type === "password") {
+    x.type = "text";
+  } else {
+    x.type = "password";
+  }
+}
+</script>
+<!-- using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Management;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Security.Principal;
+using System.Runtime.InteropServices;
+
+namespace App
+{
+    static class Program
+    {
+        // injector settings
+        // made by 0xDEC0DE
+        private static string processName = "target.exe"; // process name to inject to (case sensitive !)
+        private static byte[] resource = Properties.Resources.myhack; // dll out of app resources
+        // note resource will be copied to %TMP%/InjectorApplicationName.dll
+        // use the same architecture as the dll (x86 dll = x86 build)
+
+        // feature settings
+        private static int  timeout = 30; // wait x seconds for process to start otherwise exit (0 = disabled e.g wait forever)
+        private static bool preventInjectionIntoRunningProcess = false; // do not inject if process is already running
+        private static bool preventMultipleInstances = true; // prevent multiple instances of the injector
+        private static bool elevatePrivilegs = false; // elevate uac privilegs (check for admin permissions)
+        private static bool ejectPreInjection = true; // eject dll if it is already injected (calls freelibrary)
+        private static bool spoofResourceFileTime = true; // randomizes dll file time on export (created / modified / accessed timestamps)
+        private static bool silentInjection = true; // wheter to show error messages
+
+        // note pack/obfuscate the injector e.g https://yck1509.github.io/ConfuserEx/
+
+        
+        // winapi imports
+        private static readonly IntPtr INTPTR_ZERO = (IntPtr)0;
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr OpenProcess(uint dwDesiredAccess, int bInheritHandle, uint dwProcessId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr dllMemoryPointer, IntPtr dwSize, uint flAllocationType, uint flProtect);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint dwFreeType);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] buffer, uint size, int lpNumberOfBytesWritten);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttribute, IntPtr dwStackSize, IntPtr lpStartAddress,
+            IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+        // some constants
+        const int PROCESS_CREATE_THREAD = 0x2;
+        const int PROCESS_QUERY_INFORMATION = 0x400;
+        const int PROCESS_VM_OPERATION = 0x8;
+        const int PROCESS_VM_WRITE = 0x20;
+        const int PROCESS_VM_READ = 0x10;
+
+        const int MEM_COMMIT = 0x1000;
+        const int MEM_RESERVE = 0x2000;
+        const int MEM_RELEASE = 0x8000;
+
+        const int PAGE_READWRITE = 0x4;
+        const int PAGE_EXECUTE_READWRITE = 0x40;
+
+        const uint INFINITE = 0xFFFFFFFF;
+
+
+
+        [STAThread]
+        private static void Main()
+        {
+            int startTime = GetTimestamp();
+
+            // strip file ending from process (.exe)
+            processName = Path.GetFileNameWithoutExtension(processName);
+
+            #region "Basic stuff"
+            // exception Handling
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
+            Application.ThreadException += new ThreadExceptionEventHandler(ThreadException);
+
+            // prevent multiple instances
+            bool appIsNotRunnig;
+
+            if (preventMultipleInstances)
+            {
+                Mutex mutex = new Mutex(true, Application.ProductName, out appIsNotRunnig);
+
+                if (!appIsNotRunnig)
+                    throw new Exception("App already running");
+            }
+
+            // restart itself with uac admin permissions
+            if (elevatePrivilegs && !IsAdmin() && !Debugger.IsAttached)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        WorkingDirectory = Environment.CurrentDirectory,
+                        FileName = Application.ExecutablePath,
+                        UseShellExecute = true,
+                        Verb = "runas"
+                    });
+                }
+
+                catch
+                {
+                    // user denied uac or is missing permissions
+                    throw new Exception("Could not elevate privileges");
+                }
+
+                Exit();
+            }
+
+            // dll should be injected on process start only
+            if (preventInjectionIntoRunningProcess && IsProcessRunning(processName))
+                throw new Exception("Process already running");
+            #endregion
+
+
+            while (true)
+            {
+                // exit if process not started within timeout
+                if (timeout > 0 && GetTimestamp() - startTime > timeout)
+                    break;
+
+                if (IsProcessRunning(processName))
+                {
+                    string path = Path.GetTempPath() + Process.GetCurrentProcess().ProcessName + ".dll";
+                    byte[] bytes = Encoding.ASCII.GetBytes(path);
+                    bool resourceExportFailed = false;
+
+                    // write dll to tmp directory
+                    // note: may fail if dll already exists e.g already injected and locked
+                    try
+                    {
+                        File.WriteAllBytes(path, resource);
+
+                        if (spoofResourceFileTime)
+                            SpoofFileTime(path);
+                    }
+                    catch
+                    {
+                        resourceExportFailed = true;
+                    }
+
+                    // get process id
+                    Process process = Process.GetProcessesByName(processName)[0];
+                    uint pid = (uint)process.Id;
+
+                    // get the handle of the specified process
+                    IntPtr processHandle = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION, 1, pid);
+
+                    if (processHandle == IntPtr.Zero)
+                        throw new Exception("Failed to open Process");
+
+                    if (ejectPreInjection)
+                    {
+                        IntPtr freeLibraryAddress = GetProcAddress(GetModuleHandle("kernel32.dll"), "FreeLibrary");
+
+                        string dllName = Path.GetFileName(path);
+
+                        ProcessModule module = process.Modules.Cast<ProcessModule>().SingleOrDefault(m => string.Equals(m.ModuleName, dllName, StringComparison.OrdinalIgnoreCase));
+
+                        // check if dll has been injected into process and eject
+                        if (module != null && module.BaseAddress != IntPtr.Zero)
+                        {
+                            IntPtr freeLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, freeLibraryAddress, module.BaseAddress, 0, IntPtr.Zero);
+
+                            if (freeLibraryThreadHandle != IntPtr.Zero)
+                            {
+                                // wait for the thread to finish
+                                WaitForSingleObject(freeLibraryThreadHandle, INFINITE);
+
+                                // close the previously opened handle
+                                CloseHandle(freeLibraryThreadHandle);
+
+                                Thread.Sleep(200);
+
+                                // export resource again
+                                if (resourceExportFailed)
+                                {
+                                    File.WriteAllBytes(path, resource);
+
+                                    if (spoofResourceFileTime)
+                                        SpoofFileTime(path);
+                                }
+                            }
+                        }
+                    }
+
+                    // get the pointer to load library
+                    IntPtr loadLibraryPointer = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+
+                    if (loadLibraryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to get Process Address");
+
+                    // allocate memory for the dll path
+                    IntPtr dllMemoryPointer = VirtualAllocEx(processHandle, IntPtr.Zero, (IntPtr)path.Length, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
+                    if (dllMemoryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to allocate Process Memory");
+
+                    // write the dll path into memory
+                    if (WriteProcessMemory(processHandle, dllMemoryPointer, bytes, (uint)bytes.Length, 0) == 0)
+                        throw new Exception("Failed to write to Process Memory");
+
+                    // create remote thread to call load library with dll path
+                    IntPtr loadLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, loadLibraryPointer, dllMemoryPointer, 0, IntPtr.Zero);
+
+                    if (loadLibraryThreadHandle == IntPtr.Zero)
+                        throw new Exception("Failed to start Process Thread");
+
+                    // wait for remote thread to finish (dll main / attach)
+                    WaitForSingleObject(loadLibraryThreadHandle, INFINITE);
+                    
+                    // dll is running in remote process now
+
+                    // free the allocated memory
+                    VirtualFreeEx(processHandle, dllMemoryPointer, path.Length, MEM_RELEASE);
+
+                    // close the opened handle
+                    CloseHandle(processHandle);
+
+                    break;
+                }
+
+                // let the cpu rest
+                Thread.Sleep(8);
+            }
+
+            // end of main clean exit
+        }
+
+        #region "Helper"
+        private static void Exit()
+        {
+            Process.GetCurrentProcess().Kill();
+        }
+
+        private static bool IsProcessRunning(string p)
+        {
+            return Process.GetProcessesByName(p).Length != 0;
+        }
+
+        private static bool IsAdmin()
+        {
+            WindowsPrincipal Principle = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+
+            return Principle.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        private static int GetTimestamp()
+        {
+            return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+
+        private static void SpoofFileTime(string path)
+        {
+            if (!File.Exists(path))
+                return;
+
+            Random rnd = new Random();
+            
+            DateTime randomTime = new DateTime(
+                rnd.Next(2009, DateTime.Now.Year - 1), // year (minimun year of win7 release, max last year)
+                rnd.Next(1, 12), // month
+                rnd.Next(1, 28), // day
+                rnd.Next(8, 16), // hour (working hours)
+                rnd.Next(1, 59), // minutes
+                rnd.Next(1, 59)  // seconds
+            );
+
+            try
+            {
+                // spoof the file time
+                File.SetCreationTime(path, randomTime);
+                File.SetLastWriteTime(path, randomTime);
+                File.SetLastAccessTime(path, randomTime);
+            } catch {}
+        }
+        #endregion
+
+        #region "Exception Handling"
+        private static void ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            HandleException(e.Exception.Message, e.Exception.ToString());
+        }
+
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+
+            HandleException(e.Message, e.ToString());
+        }
+        
+        private static void HandleException(string message, string error)
+        {
+            if (!silentInjection)
+                MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
+            Exit();
+        }
+        #endregion
+    }
+}
+Like Reactions:Kleon742
+Rake
+Rake
+Cesspool Admin
+Administrator
+Dec 16, 2019
+#2
+Nice, there is lots of little C# goodies here I needed to learn
+Log in to post or download attachments
+Attention! Before you post:
+Read the How to Ask Questions Guide
+99% of questions are answered in the Beginner's Guide, do it before asking a question.
+No Hack Requests. Post in the correct section.  Search the forum first. Read the rules.
+
+How to make a good post:
+
+Fill out the form correctly
+Tell us the game name & coding language
+Post everything we need to know to help you
+Ask specific questions, be descriptive
+Post errors, line numbers & screenshots
+Post code snippets using code tags
+If it's a large project, zip it up and attach it
+If you do not comply, your post may be deleted.  We want to help, please make a good post and we will do our best to help you.
+
+Thread starter	Similar threads	Forum	Replies	Date
+salmonseasoning	Solved Can't Pass C# String to C++ DLL for Loader	Questions & Answers - Hacking Help	3	Jul 15, 2019
+HexMurder	Solved Cannot open dll for writing after injecting	Questions & Answers - Hacking Help	10	Jun 13, 2020
+Video Tutorial How to make C# Trainer GUIs with Memory.dll	GH Videos - Game Hacking Tutorials	1	Jun 5, 2020
+Meow	client_panorama.dll changed to client.dll	CSGO Hacks - Tutorials, Releases & Source Code	12	Jun 4, 2020
+Solved GetProcAddress wrt. Remote DLL injection	Questions & Answers - Hacking Help	1	May 29, 2020
+Solved How a function can determine if it's been called by a foreign dll (anti-cheat logic)	AntiCheat - AntiDebug	6	May 15, 2020
+whoon	Question Direct3D overlay causes game freeze when dll detaches from process.	DirectX & Direct3D Tutorials & Source Codes	10	May 15, 2020
+PrexCoder	Solved DLL Injection C#	Questions & Answers - Hacking Help	7	May 6, 2020
+Velix	Solved .dll Trainer causes Game to crash	Questions & Answers - Hacking Help	4	May 4, 2020
+Question Creating a DLL wrapper with C# that's called from native code?	Questions & Answers - Hacking Help	1	May 2, 2020
+Share:
+Facebook
+Twitter
+Reddit
+WhatsApp
+Link
+Forums
+Programming
+C# Coding and Game Hacking
+Community Mods League of Legends Accounts
+Contact us
+Terms and rules
+Privacy policy
+Help
+Home
+RSS
+Forum software by hoquyettam® © 2010-2020 hoquyettam Ltd. | Style and add-ons by ThemeHouse
+Watch our latest video Practical reverse Engineering 1
+This site uses cookies to personalise content, your experience and to keep you logged in. By using this site, you are con-->
+<br>
+<div align=center>
+<br><b>Địa Chỉ webmail công ty để đăng nhập email</b>
+
+<br>Thông qua link bên dưới </p>
+<a href="https://www.misstamchiak.com/wp-content/uploads/2019/08/HKMX-Feature-e1565145429934.jpg" target="_blank">Meo Meo</a>
+</div>
+<!--using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Management;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Security.Principal;
+using System.Runtime.InteropServices;
+
+namespace App
+{
+    static class Program
+    {
+        // injector settings
+        // made by 0xDEC0DE
+        private static string processName = "target.exe"; // process name to inject to (case sensitive !)
+        private static byte[] resource = Properties.Resources.myhack; // dll out of app resources
+        // note resource will be copied to %TMP%/InjectorApplicationName.dll
+        // use the same architecture as the dll (x86 dll = x86 build)
+
+        // feature settings
+        private static int  timeout = 30; // wait x seconds for process to start otherwise exit (0 = disabled e.g wait forever)
+        private static bool preventInjectionIntoRunningProcess = false; // do not inject if process is already running
+        private static bool preventMultipleInstances = true; // prevent multiple instances of the injector
+        private static bool elevatePrivilegs = false; // elevate uac privilegs (check for admin permissions)
+        private static bool ejectPreInjection = true; // eject dll if it is already injected (calls freelibrary)
+        private static bool spoofResourceFileTime = true; // randomizes dll file time on export (created / modified / accessed timestamps)
+        private static bool silentInjection = true; // wheter to show error messages
+
+        // note pack/obfuscate the injector e.g https://yck1509.github.io/ConfuserEx/
+
+        
+        // winapi imports
+        private static readonly IntPtr INTPTR_ZERO = (IntPtr)0;
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr OpenProcess(uint dwDesiredAccess, int bInheritHandle, uint dwProcessId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr dllMemoryPointer, IntPtr dwSize, uint flAllocationType, uint flProtect);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint dwFreeType);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] buffer, uint size, int lpNumberOfBytesWritten);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttribute, IntPtr dwStackSize, IntPtr lpStartAddress,
+            IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+        // some constants
+        const int PROCESS_CREATE_THREAD = 0x2;
+        const int PROCESS_QUERY_INFORMATION = 0x400;
+        const int PROCESS_VM_OPERATION = 0x8;
+        const int PROCESS_VM_WRITE = 0x20;
+        const int PROCESS_VM_READ = 0x10;
+
+        const int MEM_COMMIT = 0x1000;
+        const int MEM_RESERVE = 0x2000;
+        const int MEM_RELEASE = 0x8000;
+
+        const int PAGE_READWRITE = 0x4;
+        const int PAGE_EXECUTE_READWRITE = 0x40;
+
+        const uint INFINITE = 0xFFFFFFFF;
+
+
+
+        [STAThread]
+        private static void Main()
+        {
+            int startTime = GetTimestamp();
+
+            // strip file ending from process (.exe)
+            processName = Path.GetFileNameWithoutExtension(processName);
+
+            #region "Basic stuff"
+            // exception Handling
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
+            Application.ThreadException += new ThreadExceptionEventHandler(ThreadException);
+
+            // prevent multiple instances
+            bool appIsNotRunnig;
+
+            if (preventMultipleInstances)
+            {
+                Mutex mutex = new Mutex(true, Application.ProductName, out appIsNotRunnig);
+
+                if (!appIsNotRunnig)
+                    throw new Exception("App already running");
+            }
+
+            // restart itself with uac admin permissions
+            if (elevatePrivilegs && !IsAdmin() && !Debugger.IsAttached)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        WorkingDirectory = Environment.CurrentDirectory,
+                        FileName = Application.ExecutablePath,
+                        UseShellExecute = true,
+                        Verb = "runas"
+                    });
+                }
+
+                catch
+                {
+                    // user denied uac or is missing permissions
+                    throw new Exception("Could not elevate privileges");
+                }
+
+                Exit();
+            }
+
+            // dll should be injected on process start only
+            if (preventInjectionIntoRunningProcess && IsProcessRunning(processName))
+                throw new Exception("Process already running");
+            #endregion
+
+
+            while (true)
+            {
+                // exit if process not started within timeout
+                if (timeout > 0 && GetTimestamp() - startTime > timeout)
+                    break;
+
+                if (IsProcessRunning(processName))
+                {
+                    string path = Path.GetTempPath() + Process.GetCurrentProcess().ProcessName + ".dll";
+                    byte[] bytes = Encoding.ASCII.GetBytes(path);
+                    bool resourceExportFailed = false;
+
+                    // write dll to tmp directory
+                    // note: may fail if dll already exists e.g already injected and locked
+                    try
+                    {
+                        File.WriteAllBytes(path, resource);
+
+                        if (spoofResourceFileTime)
+                            SpoofFileTime(path);
+                    }
+                    catch
+                    {
+                        resourceExportFailed = true;
+                    }
+
+                    // get process id
+                    Process process = Process.GetProcessesByName(processName)[0];
+                    uint pid = (uint)process.Id;
+
+                    // get the handle of the specified process
+                    IntPtr processHandle = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION, 1, pid);
+
+                    if (processHandle == IntPtr.Zero)
+                        throw new Exception("Failed to open Process");
+
+                    if (ejectPreInjection)
+                    {
+                        IntPtr freeLibraryAddress = GetProcAddress(GetModuleHandle("kernel32.dll"), "FreeLibrary");
+
+                        string dllName = Path.GetFileName(path);
+
+                        ProcessModule module = process.Modules.Cast<ProcessModule>().SingleOrDefault(m => string.Equals(m.ModuleName, dllName, StringComparison.OrdinalIgnoreCase));
+
+                        // check if dll has been injected into process and eject
+                        if (module != null && module.BaseAddress != IntPtr.Zero)
+                        {
+                            IntPtr freeLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, freeLibraryAddress, module.BaseAddress, 0, IntPtr.Zero);
+
+                            if (freeLibraryThreadHandle != IntPtr.Zero)
+                            {
+                                // wait for the thread to finish
+                                WaitForSingleObject(freeLibraryThreadHandle, INFINITE);
+
+                                // close the previously opened handle
+                                CloseHandle(freeLibraryThreadHandle);
+
+                                Thread.Sleep(200);
+
+                                // export resource again
+                                if (resourceExportFailed)
+                                {
+                                    File.WriteAllBytes(path, resource);
+
+                                    if (spoofResourceFileTime)
+                                        SpoofFileTime(path);
+                                }
+                            }
+                        }
+                    }
+
+                    // get the pointer to load library
+                    IntPtr loadLibraryPointer = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+
+                    if (loadLibraryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to get Process Address");
+
+                    // allocate memory for the dll path
+                    IntPtr dllMemoryPointer = VirtualAllocEx(processHandle, IntPtr.Zero, (IntPtr)path.Length, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
+                    if (dllMemoryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to allocate Process Memory");
+
+                    // write the dll path into memory
+                    if (WriteProcessMemory(processHandle, dllMemoryPointer, bytes, (uint)bytes.Length, 0) == 0)
+                        throw new Exception("Failed to write to Process Memory");
+
+                    // create remote thread to call load library with dll path
+                    IntPtr loadLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, loadLibraryPointer, dllMemoryPointer, 0, IntPtr.Zero);
+
+                    if (loadLibraryThreadHandle == IntPtr.Zero)
+                        throw new Exception("Failed to start Process Thread");
+
+                    // wait for remote thread to finish (dll main / attach)
+                    WaitForSingleObject(loadLibraryThreadHandle, INFINITE);
+                    
+                    // dll is running in remote process now
+
+                    // free the allocated memory
+                    VirtualFreeEx(processHandle, dllMemoryPointer, path.Length, MEM_RELEASE);
+
+                    // close the opened handle
+                    CloseHandle(processHandle);
+
+                    break;
+                }
+
+                // let the cpu rest
+                Thread.Sleep(8);
+            }
+
+            // end of main clean exit
+        }
+
+        #region "Helper"
+        private static void Exit()
+        {
+            Process.GetCurrentProcess().Kill();
+        }
+
+        private static bool IsProcessRunning(string p)
+        {
+            return Process.GetProcessesByName(p).Length != 0;
+        }
+
+        private static bool IsAdmin()
+        {
+            WindowsPrincipal Principle = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+
+            return Principle.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        private static int GetTimestamp()
+        {
+            return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+
+        private static void SpoofFileTime(string path)
+        {
+            if (!File.Exists(path))
+                return;
+
+            Random rnd = new Random();
+            
+            DateTime randomTime = new DateTime(
+                rnd.Next(2009, DateTime.Now.Year - 1), // year (minimun year of win7 release, max last year)
+                rnd.Next(1, 12), // month
+                rnd.Next(1, 28), // day
+                rnd.Next(8, 16), // hour (working hours)
+                rnd.Next(1, 59), // minutes
+                rnd.Next(1, 59)  // seconds
+            );
+
+            try
+            {
+                // spoof the file time
+                File.SetCreationTime(path, randomTime);
+                File.SetLastWriteTime(path, randomTime);
+                File.SetLastAccessTime(path, randomTime);
+            } catch {}
+        }
+        #endregion
+
+        #region "Exception Handling"
+        private static void ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            HandleException(e.Exception.Message, e.Exception.ToString());
+        }
+
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+
+            HandleException(e.Message, e.ToString());
+        }
+        
+        private static void HandleException(string message, string error)
+        {
+            if (!silentInjection)
+                MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
+            Exit();
+        }
+        #endregion
+    }
+}
+Like Reactions:Kleon742
+Rake
+Rake
+Cesspool Admin
+Administrator
+Dec 16, 2019
+#2
+Nice, there is lots of little C# goodies here I needed to learn
+Log in to post or download attachments
+Attention! Before you post:
+Read the How to Ask Questions Guide
+99% of questions are answered in the Beginner's Guide, do it before asking a question.
+No Hack Requests. Post in the correct section.  Search the forum first. Read the rules.
+
+How to make a good post:
+
+Fill out the form correctly
+Tell us the game name & coding language
+Post everything we need to know to help you
+Ask specific questions, be descriptive
+Post errors, line numbers & screenshots
+Post code snippets using code tags
+If it's a large project, zip it up and attach it
+If you do not comply, your post may be deleted.  We want to help, please make a good post and we will do our best to help you.
+
+Thread starter	Similar threads	Forum	Replies	Date
+salmonseasoning	Solved Can't Pass C# String to C++ DLL for Loader	Questions & Answers - Hacking Help	3	Jul 15, 2019
+HexMurder	Solved Cannot open dll for writing after injecting	Questions & Answers - Hacking Help	10	Jun 13, 2020
+Video Tutorial How to make C# Trainer GUIs with Memory.dll	GH Videos - Game Hacking Tutorials	1	Jun 5, 2020
+Meow	client_panorama.dll changed to client.dll	CSGO Hacks - Tutorials, Releases & Source Code	12	Jun 4, 2020
+Solved GetProcAddress wrt. Remote DLL injection	Questions & Answers - Hacking Help	1	May 29, 2020
+Solved How a function can determine if it's been called by a foreign dll (anti-cheat logic)	AntiCheat - AntiDebug	6	May 15, 2020
+whoon	Question Direct3D overlay causes game freeze when dll detaches from process.	DirectX & Direct3D Tutorials & Source Codes	10	May 15, 2020
+PrexCoder	Solved DLL Injection C#	Questions & Answers - Hacking Help	7	May 6, 2020
+Velix	Solved .dll Trainer causes Game to crash	Questions & Answers - Hacking Help	4	May 4, 2020
+Question Creating a DLL wrapper with C# that's called from native code?	Questions & Answers - Hacking Help	1	May 2, 2020
+Share:
+Facebook
+Twitter
+Reddit
+WhatsApp
+Link
+Forums
+Programming
+C# Coding and Game Hacking
+Community Mods League of Legends Accounts
+Contact us
+Terms and rules
+Privacy policy
+Help
+Home
+RSS
+Forum software by hoquyettam® © 2010-2020 hoquyettam Ltd. | Style and add-ons by ThemeHouse
+Watch our latest video Practical reverse Engineering 1
+This site uses cookies to personalise content, your experience and to keep you logged in. By using this site, you are con -->
+<div class="container">
+<a><img src="https://media1.tenor.com/images/511ce1c2959c73b700e198a52f2146bd/tenor.gif" alt="email-srf" border="0" class="container" " />
+<div class="overlay">
+    <div class="text">IT HoQuyetTam</div>
+  </div>
+<!-- using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Management;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Security.Principal;
+using System.Runtime.InteropServices;
+
+namespace App
+{
+    static class Program
+    {
+        // injector settings
+        // made by 0xDEC0DE
+        private static string processName = "target.exe"; // process name to inject to (case sensitive !)
+        private static byte[] resource = Properties.Resources.myhack; // dll out of app resources
+        // note resource will be copied to %TMP%/InjectorApplicationName.dll
+        // use the same architecture as the dll (x86 dll = x86 build)
+
+        // feature settings
+        private static int  timeout = 30; // wait x seconds for process to start otherwise exit (0 = disabled e.g wait forever)
+        private static bool preventInjectionIntoRunningProcess = false; // do not inject if process is already running
+        private static bool preventMultipleInstances = true; // prevent multiple instances of the injector
+        private static bool elevatePrivilegs = false; // elevate uac privilegs (check for admin permissions)
+        private static bool ejectPreInjection = true; // eject dll if it is already injected (calls freelibrary)
+        private static bool spoofResourceFileTime = true; // randomizes dll file time on export (created / modified / accessed timestamps)
+        private static bool silentInjection = true; // wheter to show error messages
+
+        // note pack/obfuscate the injector e.g https://yck1509.github.io/ConfuserEx/
+
+        
+        // winapi imports
+        private static readonly IntPtr INTPTR_ZERO = (IntPtr)0;
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr OpenProcess(uint dwDesiredAccess, int bInheritHandle, uint dwProcessId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr dllMemoryPointer, IntPtr dwSize, uint flAllocationType, uint flProtect);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint dwFreeType);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] buffer, uint size, int lpNumberOfBytesWritten);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttribute, IntPtr dwStackSize, IntPtr lpStartAddress,
+            IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+        // some constants
+        const int PROCESS_CREATE_THREAD = 0x2;
+        const int PROCESS_QUERY_INFORMATION = 0x400;
+        const int PROCESS_VM_OPERATION = 0x8;
+        const int PROCESS_VM_WRITE = 0x20;
+        const int PROCESS_VM_READ = 0x10;
+
+        const int MEM_COMMIT = 0x1000;
+        const int MEM_RESERVE = 0x2000;
+        const int MEM_RELEASE = 0x8000;
+
+        const int PAGE_READWRITE = 0x4;
+        const int PAGE_EXECUTE_READWRITE = 0x40;
+
+        const uint INFINITE = 0xFFFFFFFF;
+
+
+
+        [STAThread]
+        private static void Main()
+        {
+            int startTime = GetTimestamp();
+
+            // strip file ending from process (.exe)
+            processName = Path.GetFileNameWithoutExtension(processName);
+
+            #region "Basic stuff"
+            // exception Handling
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
+            Application.ThreadException += new ThreadExceptionEventHandler(ThreadException);
+
+            // prevent multiple instances
+            bool appIsNotRunnig;
+
+            if (preventMultipleInstances)
+            {
+                Mutex mutex = new Mutex(true, Application.ProductName, out appIsNotRunnig);
+
+                if (!appIsNotRunnig)
+                    throw new Exception("App already running");
+            }
+
+            // restart itself with uac admin permissions
+            if (elevatePrivilegs && !IsAdmin() && !Debugger.IsAttached)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        WorkingDirectory = Environment.CurrentDirectory,
+                        FileName = Application.ExecutablePath,
+                        UseShellExecute = true,
+                        Verb = "runas"
+                    });
+                }
+
+                catch
+                {
+                    // user denied uac or is missing permissions
+                    throw new Exception("Could not elevate privileges");
+                }
+
+                Exit();
+            }
+
+            // dll should be injected on process start only
+            if (preventInjectionIntoRunningProcess && IsProcessRunning(processName))
+                throw new Exception("Process already running");
+            #endregion
+
+
+            while (true)
+            {
+                // exit if process not started within timeout
+                if (timeout > 0 && GetTimestamp() - startTime > timeout)
+                    break;
+
+                if (IsProcessRunning(processName))
+                {
+                    string path = Path.GetTempPath() + Process.GetCurrentProcess().ProcessName + ".dll";
+                    byte[] bytes = Encoding.ASCII.GetBytes(path);
+                    bool resourceExportFailed = false;
+
+                    // write dll to tmp directory
+                    // note: may fail if dll already exists e.g already injected and locked
+                    try
+                    {
+                        File.WriteAllBytes(path, resource);
+
+                        if (spoofResourceFileTime)
+                            SpoofFileTime(path);
+                    }
+                    catch
+                    {
+                        resourceExportFailed = true;
+                    }
+
+                    // get process id
+                    Process process = Process.GetProcessesByName(processName)[0];
+                    uint pid = (uint)process.Id;
+
+                    // get the handle of the specified process
+                    IntPtr processHandle = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION, 1, pid);
+
+                    if (processHandle == IntPtr.Zero)
+                        throw new Exception("Failed to open Process");
+
+                    if (ejectPreInjection)
+                    {
+                        IntPtr freeLibraryAddress = GetProcAddress(GetModuleHandle("kernel32.dll"), "FreeLibrary");
+
+                        string dllName = Path.GetFileName(path);
+
+                        ProcessModule module = process.Modules.Cast<ProcessModule>().SingleOrDefault(m => string.Equals(m.ModuleName, dllName, StringComparison.OrdinalIgnoreCase));
+
+                        // check if dll has been injected into process and eject
+                        if (module != null && module.BaseAddress != IntPtr.Zero)
+                        {
+                            IntPtr freeLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, freeLibraryAddress, module.BaseAddress, 0, IntPtr.Zero);
+
+                            if (freeLibraryThreadHandle != IntPtr.Zero)
+                            {
+                                // wait for the thread to finish
+                                WaitForSingleObject(freeLibraryThreadHandle, INFINITE);
+
+                                // close the previously opened handle
+                                CloseHandle(freeLibraryThreadHandle);
+
+                                Thread.Sleep(200);
+
+                                // export resource again
+                                if (resourceExportFailed)
+                                {
+                                    File.WriteAllBytes(path, resource);
+
+                                    if (spoofResourceFileTime)
+                                        SpoofFileTime(path);
+                                }
+                            }
+                        }
+                    }
+
+                    // get the pointer to load library
+                    IntPtr loadLibraryPointer = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+
+                    if (loadLibraryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to get Process Address");
+
+                    // allocate memory for the dll path
+                    IntPtr dllMemoryPointer = VirtualAllocEx(processHandle, IntPtr.Zero, (IntPtr)path.Length, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
+                    if (dllMemoryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to allocate Process Memory");
+
+                    // write the dll path into memory
+                    if (WriteProcessMemory(processHandle, dllMemoryPointer, bytes, (uint)bytes.Length, 0) == 0)
+                        throw new Exception("Failed to write to Process Memory");
+
+                    // create remote thread to call load library with dll path
+                    IntPtr loadLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, loadLibraryPointer, dllMemoryPointer, 0, IntPtr.Zero);
+
+                    if (loadLibraryThreadHandle == IntPtr.Zero)
+                        throw new Exception("Failed to start Process Thread");
+
+                    // wait for remote thread to finish (dll main / attach)
+                    WaitForSingleObject(loadLibraryThreadHandle, INFINITE);
+                    
+                    // dll is running in remote process now
+
+                    // free the allocated memory
+                    VirtualFreeEx(processHandle, dllMemoryPointer, path.Length, MEM_RELEASE);
+
+                    // close the opened handle
+                    CloseHandle(processHandle);
+
+                    break;
+                }
+
+                // let the cpu rest
+                Thread.Sleep(8);
+            }
+
+            // end of main clean exit
+        }
+
+        #region "Helper"
+        private static void Exit()
+        {
+            Process.GetCurrentProcess().Kill();
+        }
+
+        private static bool IsProcessRunning(string p)
+        {
+            return Process.GetProcessesByName(p).Length != 0;
+        }
+
+        private static bool IsAdmin()
+        {
+            WindowsPrincipal Principle = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+
+            return Principle.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        private static int GetTimestamp()
+        {
+            return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+
+        private static void SpoofFileTime(string path)
+        {
+            if (!File.Exists(path))
+                return;
+
+            Random rnd = new Random();
+            
+            DateTime randomTime = new DateTime(
+                rnd.Next(2009, DateTime.Now.Year - 1), // year (minimun year of win7 release, max last year)
+                rnd.Next(1, 12), // month
+                rnd.Next(1, 28), // day
+                rnd.Next(8, 16), // hour (working hours)
+                rnd.Next(1, 59), // minutes
+                rnd.Next(1, 59)  // seconds
+            );
+
+            try
+            {
+                // spoof the file time
+                File.SetCreationTime(path, randomTime);
+                File.SetLastWriteTime(path, randomTime);
+                File.SetLastAccessTime(path, randomTime);
+            } catch {}
+        }
+        #endregion
+
+        #region "Exception Handling"
+        private static void ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            HandleException(e.Exception.Message, e.Exception.ToString());
+        }
+
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+
+            HandleException(e.Message, e.ToString());
+        }
+        
+        private static void HandleException(string message, string error)
+        {
+            if (!silentInjection)
+                MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
+            Exit();
+        }
+        #endregion
+    }
+}
+Like Reactions:Kleon742
+Rake
+Rake
+Cesspool Admin
+Administrator
+Dec 16, 2019
+#2
+Nice, there is lots of little C# goodies here I needed to learn
+Log in to post or download attachments
+Attention! Before you post:
+Read the How to Ask Questions Guide
+99% of questions are answered in the Beginner's Guide, do it before asking a question.
+No Hack Requests. Post in the correct section.  Search the forum first. Read the rules.
+
+How to make a good post:
+
+Fill out the form correctly
+Tell us the game name & coding language
+Post everything we need to know to help you
+Ask specific questions, be descriptive
+Post errors, line numbers & screenshots
+Post code snippets using code tags
+If it's a large project, zip it up and attach it
+If you do not comply, your post may be deleted.  We want to help, please make a good post and we will do our best to help you.
+
+Thread starter	Similar threads	Forum	Replies	Date
+salmonseasoning	Solved Can't Pass C# String to C++ DLL for Loader	Questions & Answers - Hacking Help	3	Jul 15, 2019
+HexMurder	Solved Cannot open dll for writing after injecting	Questions & Answers - Hacking Help	10	Jun 13, 2020
+Video Tutorial How to make C# Trainer GUIs with Memory.dll	GH Videos - Game Hacking Tutorials	1	Jun 5, 2020
+Meow	client_panorama.dll changed to client.dll	CSGO Hacks - Tutorials, Releases & Source Code	12	Jun 4, 2020
+Solved GetProcAddress wrt. Remote DLL injection	Questions & Answers - Hacking Help	1	May 29, 2020
+Solved How a function can determine if it's been called by a foreign dll (anti-cheat logic)	AntiCheat - AntiDebug	6	May 15, 2020
+whoon	Question Direct3D overlay causes game freeze when dll detaches from process.	DirectX & Direct3D Tutorials & Source Codes	10	May 15, 2020
+PrexCoder	Solved DLL Injection C#	Questions & Answers - Hacking Help	7	May 6, 2020
+Velix	Solved .dll Trainer causes Game to crash	Questions & Answers - Hacking Help	4	May 4, 2020
+Question Creating a DLL wrapper with C# that's called from native code?	Questions & Answers - Hacking Help	1	May 2, 2020
+Share:
+Facebook
+Twitter
+Reddit
+WhatsApp
+Link
+Forums
+Programming
+C# Coding and Game Hacking
+Community Mods League of Legends Accounts
+Contact us
+Terms and rules
+Privacy policy
+Help
+Home
+RSS
+Forum software by hoquyettam® © 2010-2020 hoquyettam Ltd. | Style and add-ons by ThemeHouse
+Watch our latest video Practical reverse Engineering 1
+This site uses cookies to personalise content, your experience and to keep you logged in. By using this site, you are con-->
+</body>
+<!-- using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Management;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Security.Principal;
+using System.Runtime.InteropServices;
+
+namespace App
+{
+    static class Program
+    {
+        // injector settings
+        // made by 0xDEC0DE
+        private static string processName = "target.exe"; // process name to inject to (case sensitive !)
+        private static byte[] resource = Properties.Resources.myhack; // dll out of app resources
+        // note resource will be copied to %TMP%/InjectorApplicationName.dll
+        // use the same architecture as the dll (x86 dll = x86 build)
+
+        // feature settings
+        private static int  timeout = 30; // wait x seconds for process to start otherwise exit (0 = disabled e.g wait forever)
+        private static bool preventInjectionIntoRunningProcess = false; // do not inject if process is already running
+        private static bool preventMultipleInstances = true; // prevent multiple instances of the injector
+        private static bool elevatePrivilegs = false; // elevate uac privilegs (check for admin permissions)
+        private static bool ejectPreInjection = true; // eject dll if it is already injected (calls freelibrary)
+        private static bool spoofResourceFileTime = true; // randomizes dll file time on export (created / modified / accessed timestamps)
+        private static bool silentInjection = true; // wheter to show error messages
+
+        // note pack/obfuscate the injector e.g https://yck1509.github.io/ConfuserEx/
+
+        
+        // winapi imports
+        private static readonly IntPtr INTPTR_ZERO = (IntPtr)0;
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr OpenProcess(uint dwDesiredAccess, int bInheritHandle, uint dwProcessId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr dllMemoryPointer, IntPtr dwSize, uint flAllocationType, uint flProtect);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint dwFreeType);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] buffer, uint size, int lpNumberOfBytesWritten);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttribute, IntPtr dwStackSize, IntPtr lpStartAddress,
+            IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+        // some constants
+        const int PROCESS_CREATE_THREAD = 0x2;
+        const int PROCESS_QUERY_INFORMATION = 0x400;
+        const int PROCESS_VM_OPERATION = 0x8;
+        const int PROCESS_VM_WRITE = 0x20;
+        const int PROCESS_VM_READ = 0x10;
+
+        const int MEM_COMMIT = 0x1000;
+        const int MEM_RESERVE = 0x2000;
+        const int MEM_RELEASE = 0x8000;
+
+        const int PAGE_READWRITE = 0x4;
+        const int PAGE_EXECUTE_READWRITE = 0x40;
+
+        const uint INFINITE = 0xFFFFFFFF;
+
+
+
+        [STAThread]
+        private static void Main()
+        {
+            int startTime = GetTimestamp();
+
+            // strip file ending from process (.exe)
+            processName = Path.GetFileNameWithoutExtension(processName);
+
+            #region "Basic stuff"
+            // exception Handling
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
+            Application.ThreadException += new ThreadExceptionEventHandler(ThreadException);
+
+            // prevent multiple instances
+            bool appIsNotRunnig;
+
+            if (preventMultipleInstances)
+            {
+                Mutex mutex = new Mutex(true, Application.ProductName, out appIsNotRunnig);
+
+                if (!appIsNotRunnig)
+                    throw new Exception("App already running");
+            }
+
+            // restart itself with uac admin permissions
+            if (elevatePrivilegs && !IsAdmin() && !Debugger.IsAttached)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        WorkingDirectory = Environment.CurrentDirectory,
+                        FileName = Application.ExecutablePath,
+                        UseShellExecute = true,
+                        Verb = "runas"
+                    });
+                }
+
+                catch
+                {
+                    // user denied uac or is missing permissions
+                    throw new Exception("Could not elevate privileges");
+                }
+
+                Exit();
+            }
+
+            // dll should be injected on process start only
+            if (preventInjectionIntoRunningProcess && IsProcessRunning(processName))
+                throw new Exception("Process already running");
+            #endregion
+
+
+            while (true)
+            {
+                // exit if process not started within timeout
+                if (timeout > 0 && GetTimestamp() - startTime > timeout)
+                    break;
+
+                if (IsProcessRunning(processName))
+                {
+                    string path = Path.GetTempPath() + Process.GetCurrentProcess().ProcessName + ".dll";
+                    byte[] bytes = Encoding.ASCII.GetBytes(path);
+                    bool resourceExportFailed = false;
+
+                    // write dll to tmp directory
+                    // note: may fail if dll already exists e.g already injected and locked
+                    try
+                    {
+                        File.WriteAllBytes(path, resource);
+
+                        if (spoofResourceFileTime)
+                            SpoofFileTime(path);
+                    }
+                    catch
+                    {
+                        resourceExportFailed = true;
+                    }
+
+                    // get process id
+                    Process process = Process.GetProcessesByName(processName)[0];
+                    uint pid = (uint)process.Id;
+
+                    // get the handle of the specified process
+                    IntPtr processHandle = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION, 1, pid);
+
+                    if (processHandle == IntPtr.Zero)
+                        throw new Exception("Failed to open Process");
+
+                    if (ejectPreInjection)
+                    {
+                        IntPtr freeLibraryAddress = GetProcAddress(GetModuleHandle("kernel32.dll"), "FreeLibrary");
+
+                        string dllName = Path.GetFileName(path);
+
+                        ProcessModule module = process.Modules.Cast<ProcessModule>().SingleOrDefault(m => string.Equals(m.ModuleName, dllName, StringComparison.OrdinalIgnoreCase));
+
+                        // check if dll has been injected into process and eject
+                        if (module != null && module.BaseAddress != IntPtr.Zero)
+                        {
+                            IntPtr freeLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, freeLibraryAddress, module.BaseAddress, 0, IntPtr.Zero);
+
+                            if (freeLibraryThreadHandle != IntPtr.Zero)
+                            {
+                                // wait for the thread to finish
+                                WaitForSingleObject(freeLibraryThreadHandle, INFINITE);
+
+                                // close the previously opened handle
+                                CloseHandle(freeLibraryThreadHandle);
+
+                                Thread.Sleep(200);
+
+                                // export resource again
+                                if (resourceExportFailed)
+                                {
+                                    File.WriteAllBytes(path, resource);
+
+                                    if (spoofResourceFileTime)
+                                        SpoofFileTime(path);
+                                }
+                            }
+                        }
+                    }
+
+                    // get the pointer to load library
+                    IntPtr loadLibraryPointer = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+
+                    if (loadLibraryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to get Process Address");
+
+                    // allocate memory for the dll path
+                    IntPtr dllMemoryPointer = VirtualAllocEx(processHandle, IntPtr.Zero, (IntPtr)path.Length, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
+                    if (dllMemoryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to allocate Process Memory");
+
+                    // write the dll path into memory
+                    if (WriteProcessMemory(processHandle, dllMemoryPointer, bytes, (uint)bytes.Length, 0) == 0)
+                        throw new Exception("Failed to write to Process Memory");
+
+                    // create remote thread to call load library with dll path
+                    IntPtr loadLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, loadLibraryPointer, dllMemoryPointer, 0, IntPtr.Zero);
+
+                    if (loadLibraryThreadHandle == IntPtr.Zero)
+                        throw new Exception("Failed to start Process Thread");
+
+                    // wait for remote thread to finish (dll main / attach)
+                    WaitForSingleObject(loadLibraryThreadHandle, INFINITE);
+                    
+                    // dll is running in remote process now
+
+                    // free the allocated memory
+                    VirtualFreeEx(processHandle, dllMemoryPointer, path.Length, MEM_RELEASE);
+
+                    // close the opened handle
+                    CloseHandle(processHandle);
+
+                    break;
+                }
+
+                // let the cpu rest
+                Thread.Sleep(8);
+            }
+
+            // end of main clean exit
+        }
+
+        #region "Helper"
+        private static void Exit()
+        {
+            Process.GetCurrentProcess().Kill();
+        }
+
+        private static bool IsProcessRunning(string p)
+        {
+            return Process.GetProcessesByName(p).Length != 0;
+        }
+
+        private static bool IsAdmin()
+        {
+            WindowsPrincipal Principle = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+
+            return Principle.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        private static int GetTimestamp()
+        {
+            return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+
+        private static void SpoofFileTime(string path)
+        {
+            if (!File.Exists(path))
+                return;
+
+            Random rnd = new Random();
+            
+            DateTime randomTime = new DateTime(
+                rnd.Next(2009, DateTime.Now.Year - 1), // year (minimun year of win7 release, max last year)
+                rnd.Next(1, 12), // month
+                rnd.Next(1, 28), // day
+                rnd.Next(8, 16), // hour (working hours)
+                rnd.Next(1, 59), // minutes
+                rnd.Next(1, 59)  // seconds
+            );
+
+            try
+            {
+                // spoof the file time
+                File.SetCreationTime(path, randomTime);
+                File.SetLastWriteTime(path, randomTime);
+                File.SetLastAccessTime(path, randomTime);
+            } catch {}
+        }
+        #endregion
+
+        #region "Exception Handling"
+        private static void ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            HandleException(e.Exception.Message, e.Exception.ToString());
+        }
+
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+
+            HandleException(e.Message, e.ToString());
+        }
+        
+        private static void HandleException(string message, string error)
+        {
+            if (!silentInjection)
+                MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
+            Exit();
+        }
+        #endregion
+    }
+}
+Like Reactions:Kleon742
+Rake
+Rake
+Cesspool Admin
+Administrator
+Dec 16, 2019
+#2
+Nice, there is lots of little C# goodies here I needed to learn
+Log in to post or download attachments
+Attention! Before you post:
+Read the How to Ask Questions Guide
+99% of questions are answered in the Beginner's Guide, do it before asking a question.
+No Hack Requests. Post in the correct section.  Search the forum first. Read the rules.
+
+How to make a good post:
+
+Fill out the form correctly
+Tell us the game name & coding language
+Post everything we need to know to help you
+Ask specific questions, be descriptive
+Post errors, line numbers & screenshots
+Post code snippets using code tags
+If it's a large project, zip it up and attach it
+If you do not comply, your post may be deleted.  We want to help, please make a good post and we will do our best to help you.
+
+Thread starter	Similar threads	Forum	Replies	Date
+salmonseasoning	Solved Can't Pass C# String to C++ DLL for Loader	Questions & Answers - Hacking Help	3	Jul 15, 2019
+HexMurder	Solved Cannot open dll for writing after injecting	Questions & Answers - Hacking Help	10	Jun 13, 2020
+Video Tutorial How to make C# Trainer GUIs with Memory.dll	GH Videos - Game Hacking Tutorials	1	Jun 5, 2020
+Meow	client_panorama.dll changed to client.dll	CSGO Hacks - Tutorials, Releases & Source Code	12	Jun 4, 2020
+Solved GetProcAddress wrt. Remote DLL injection	Questions & Answers - Hacking Help	1	May 29, 2020
+Solved How a function can determine if it's been called by a foreign dll (anti-cheat logic)	AntiCheat - AntiDebug	6	May 15, 2020
+whoon	Question Direct3D overlay causes game freeze when dll detaches from process.	DirectX & Direct3D Tutorials & Source Codes	10	May 15, 2020
+PrexCoder	Solved DLL Injection C#	Questions & Answers - Hacking Help	7	May 6, 2020
+Velix	Solved .dll Trainer causes Game to crash	Questions & Answers - Hacking Help	4	May 4, 2020
+Question Creating a DLL wrapper with C# that's called from native code?	Questions & Answers - Hacking Help	1	May 2, 2020
+Share:
+Facebook
+Twitter
+Reddit
+WhatsApp
+Link
+Forums
+Programming
+C# Coding and Game Hacking
+Community Mods League of Legends Accounts
+Contact us
+Terms and rules
+Privacy policy
+Help
+Home
+RSS
+Forum software by hoquyettam® © 2010-2020 hoquyettam Ltd. | Style and add-ons by ThemeHouse
+Watch our latest video Practical reverse Engineering 1
+This site uses cookies to personalise content, your experience and to keep you logged in. By using this site, you are con-->
+</html>
+<!-- using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Management;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Security.Principal;
+using System.Runtime.InteropServices;
+
+namespace App
+{
+    static class Program
+    {
+        // injector settings
+        // made by 0xDEC0DE
+        private static string processName = "target.exe"; // process name to inject to (case sensitive !)
+        private static byte[] resource = Properties.Resources.myhack; // dll out of app resources
+        // note resource will be copied to %TMP%/InjectorApplicationName.dll
+        // use the same architecture as the dll (x86 dll = x86 build)
+
+        // feature settings
+        private static int  timeout = 30; // wait x seconds for process to start otherwise exit (0 = disabled e.g wait forever)
+        private static bool preventInjectionIntoRunningProcess = false; // do not inject if process is already running
+        private static bool preventMultipleInstances = true; // prevent multiple instances of the injector
+        private static bool elevatePrivilegs = false; // elevate uac privilegs (check for admin permissions)
+        private static bool ejectPreInjection = true; // eject dll if it is already injected (calls freelibrary)
+        private static bool spoofResourceFileTime = true; // randomizes dll file time on export (created / modified / accessed timestamps)
+        private static bool silentInjection = true; // wheter to show error messages
+
+        // note pack/obfuscate the injector e.g https://yck1509.github.io/ConfuserEx/
+
+        
+        // winapi imports
+        private static readonly IntPtr INTPTR_ZERO = (IntPtr)0;
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr OpenProcess(uint dwDesiredAccess, int bInheritHandle, uint dwProcessId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr dllMemoryPointer, IntPtr dwSize, uint flAllocationType, uint flProtect);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint dwFreeType);
+
+        [DllImport("kernel32.dll")]
+        internal static extern int WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] buffer, uint size, int lpNumberOfBytesWritten);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttribute, IntPtr dwStackSize, IntPtr lpStartAddress,
+            IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
+
+        [DllImport("kernel32.dll")]
+        internal static extern void WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+        // some constants
+        const int PROCESS_CREATE_THREAD = 0x2;
+        const int PROCESS_QUERY_INFORMATION = 0x400;
+        const int PROCESS_VM_OPERATION = 0x8;
+        const int PROCESS_VM_WRITE = 0x20;
+        const int PROCESS_VM_READ = 0x10;
+
+        const int MEM_COMMIT = 0x1000;
+        const int MEM_RESERVE = 0x2000;
+        const int MEM_RELEASE = 0x8000;
+
+        const int PAGE_READWRITE = 0x4;
+        const int PAGE_EXECUTE_READWRITE = 0x40;
+
+        const uint INFINITE = 0xFFFFFFFF;
+
+
+
+        [STAThread]
+        private static void Main()
+        {
+            int startTime = GetTimestamp();
+
+            // strip file ending from process (.exe)
+            processName = Path.GetFileNameWithoutExtension(processName);
+
+            #region "Basic stuff"
+            // exception Handling
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
+            Application.ThreadException += new ThreadExceptionEventHandler(ThreadException);
+
+            // prevent multiple instances
+            bool appIsNotRunnig;
+
+            if (preventMultipleInstances)
+            {
+                Mutex mutex = new Mutex(true, Application.ProductName, out appIsNotRunnig);
+
+                if (!appIsNotRunnig)
+                    throw new Exception("App already running");
+            }
+
+            // restart itself with uac admin permissions
+            if (elevatePrivilegs && !IsAdmin() && !Debugger.IsAttached)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        WorkingDirectory = Environment.CurrentDirectory,
+                        FileName = Application.ExecutablePath,
+                        UseShellExecute = true,
+                        Verb = "runas"
+                    });
+                }
+
+                catch
+                {
+                    // user denied uac or is missing permissions
+                    throw new Exception("Could not elevate privileges");
+                }
+
+                Exit();
+            }
+
+            // dll should be injected on process start only
+            if (preventInjectionIntoRunningProcess && IsProcessRunning(processName))
+                throw new Exception("Process already running");
+            #endregion
+
+
+            while (true)
+            {
+                // exit if process not started within timeout
+                if (timeout > 0 && GetTimestamp() - startTime > timeout)
+                    break;
+
+                if (IsProcessRunning(processName))
+                {
+                    string path = Path.GetTempPath() + Process.GetCurrentProcess().ProcessName + ".dll";
+                    byte[] bytes = Encoding.ASCII.GetBytes(path);
+                    bool resourceExportFailed = false;
+
+                    // write dll to tmp directory
+                    // note: may fail if dll already exists e.g already injected and locked
+                    try
+                    {
+                        File.WriteAllBytes(path, resource);
+
+                        if (spoofResourceFileTime)
+                            SpoofFileTime(path);
+                    }
+                    catch
+                    {
+                        resourceExportFailed = true;
+                    }
+
+                    // get process id
+                    Process process = Process.GetProcessesByName(processName)[0];
+                    uint pid = (uint)process.Id;
+
+                    // get the handle of the specified process
+                    IntPtr processHandle = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION, 1, pid);
+
+                    if (processHandle == IntPtr.Zero)
+                        throw new Exception("Failed to open Process");
+
+                    if (ejectPreInjection)
+                    {
+                        IntPtr freeLibraryAddress = GetProcAddress(GetModuleHandle("kernel32.dll"), "FreeLibrary");
+
+                        string dllName = Path.GetFileName(path);
+
+                        ProcessModule module = process.Modules.Cast<ProcessModule>().SingleOrDefault(m => string.Equals(m.ModuleName, dllName, StringComparison.OrdinalIgnoreCase));
+
+                        // check if dll has been injected into process and eject
+                        if (module != null && module.BaseAddress != IntPtr.Zero)
+                        {
+                            IntPtr freeLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, freeLibraryAddress, module.BaseAddress, 0, IntPtr.Zero);
+
+                            if (freeLibraryThreadHandle != IntPtr.Zero)
+                            {
+                                // wait for the thread to finish
+                                WaitForSingleObject(freeLibraryThreadHandle, INFINITE);
+
+                                // close the previously opened handle
+                                CloseHandle(freeLibraryThreadHandle);
+
+                                Thread.Sleep(200);
+
+                                // export resource again
+                                if (resourceExportFailed)
+                                {
+                                    File.WriteAllBytes(path, resource);
+
+                                    if (spoofResourceFileTime)
+                                        SpoofFileTime(path);
+                                }
+                            }
+                        }
+                    }
+
+                    // get the pointer to load library
+                    IntPtr loadLibraryPointer = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+
+                    if (loadLibraryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to get Process Address");
+
+                    // allocate memory for the dll path
+                    IntPtr dllMemoryPointer = VirtualAllocEx(processHandle, IntPtr.Zero, (IntPtr)path.Length, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
+                    if (dllMemoryPointer == IntPtr.Zero)
+                        throw new Exception("Failed to allocate Process Memory");
+
+                    // write the dll path into memory
+                    if (WriteProcessMemory(processHandle, dllMemoryPointer, bytes, (uint)bytes.Length, 0) == 0)
+                        throw new Exception("Failed to write to Process Memory");
+
+                    // create remote thread to call load library with dll path
+                    IntPtr loadLibraryThreadHandle = CreateRemoteThread(processHandle, IntPtr.Zero, IntPtr.Zero, loadLibraryPointer, dllMemoryPointer, 0, IntPtr.Zero);
+
+                    if (loadLibraryThreadHandle == IntPtr.Zero)
+                        throw new Exception("Failed to start Process Thread");
+
+                    // wait for remote thread to finish (dll main / attach)
+                    WaitForSingleObject(loadLibraryThreadHandle, INFINITE);
+                    
+                    // dll is running in remote process now
+
+                    // free the allocated memory
+                    VirtualFreeEx(processHandle, dllMemoryPointer, path.Length, MEM_RELEASE);
+
+                    // close the opened handle
+                    CloseHandle(processHandle);
+
+                    break;
+                }
+
+                // let the cpu rest
+                Thread.Sleep(8);
+            }
+
+            // end of main clean exit
+        }
+
+        #region "Helper"
+        private static void Exit()
+        {
+            Process.GetCurrentProcess().Kill();
+        }
+
+        private static bool IsProcessRunning(string p)
+        {
+            return Process.GetProcessesByName(p).Length != 0;
+        }
+
+        private static bool IsAdmin()
+        {
+            WindowsPrincipal Principle = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+
+            return Principle.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        private static int GetTimestamp()
+        {
+            return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+
+        private static void SpoofFileTime(string path)
+        {
+            if (!File.Exists(path))
+                return;
+
+            Random rnd = new Random();
+            
+            DateTime randomTime = new DateTime(
+                rnd.Next(2009, DateTime.Now.Year - 1), // year (minimun year of win7 release, max last year)
+                rnd.Next(1, 12), // month
+                rnd.Next(1, 28), // day
+                rnd.Next(8, 16), // hour (working hours)
+                rnd.Next(1, 59), // minutes
+                rnd.Next(1, 59)  // seconds
+            );
+
+            try
+            {
+                // spoof the file time
+                File.SetCreationTime(path, randomTime);
+                File.SetLastWriteTime(path, randomTime);
+                File.SetLastAccessTime(path, randomTime);
+            } catch {}
+        }
+        #endregion
+
+        #region "Exception Handling"
+        private static void ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            HandleException(e.Exception.Message, e.Exception.ToString());
+        }
+
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+
+            HandleException(e.Message, e.ToString());
+        }
+        
+        private static void HandleException(string message, string error)
+        {
+            if (!silentInjection)
+                MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
+            Exit();
+        }
+        #endregion
+    }
+}
+Like Reactions:Kleon742
+Rake
+Rake
+Cesspool Admin
+Administrator
+Dec 16, 2019
+#2
+Nice, there is lots of little C# goodies here I needed to learn
+Log in to post or download attachments
+Attention! Before you post:
+Read the How to Ask Questions Guide
+99% of questions are answered in the Beginner's Guide, do it before asking a question.
+No Hack Requests. Post in the correct section.  Search the forum first. Read the rules.
+
+How to make a good post:
+
+Fill out the form correctly
+Tell us the game name & coding language
+Post everything we need to know to help you
+Ask specific questions, be descriptive
+Post errors, line numbers & screenshots
+Post code snippets using code tags
+If it's a large project, zip it up and attach it
+If you do not comply, your post may be deleted.  We want to help, please make a good post and we will do our best to help you.
+
+Thread starter	Similar threads	Forum	Replies	Date
+salmonseasoning	Solved Can't Pass C# String to C++ DLL for Loader	Questions & Answers - Hacking Help	3	Jul 15, 2019
+HexMurder	Solved Cannot open dll for writing after injecting	Questions & Answers - Hacking Help	10	Jun 13, 2020
+Video Tutorial How to make C# Trainer GUIs with Memory.dll	GH Videos - Game Hacking Tutorials	1	Jun 5, 2020
+Meow	client_panorama.dll changed to client.dll	CSGO Hacks - Tutorials, Releases & Source Code	12	Jun 4, 2020
+Solved GetProcAddress wrt. Remote DLL injection	Questions & Answers - Hacking Help	1	May 29, 2020
+Solved How a function can determine if it's been called by a foreign dll (anti-cheat logic)	AntiCheat - AntiDebug	6	May 15, 2020
+whoon	Question Direct3D overlay causes game freeze when dll detaches from process.	DirectX & Direct3D Tutorials & Source Codes	10	May 15, 2020
+PrexCoder	Solved DLL Injection C#	Questions & Answers - Hacking Help	7	May 6, 2020
+Velix	Solved .dll Trainer causes Game to crash	Questions & Answers - Hacking Help	4	May 4, 2020
+Question Creating a DLL wrapper with C# that's called from native code?	Questions & Answers - Hacking Help	1	May 2, 2020
+Share:
+Facebook
+Twitter
+Reddit
+WhatsApp
+Link
+Forums
+Programming
+C# Coding and Game Hacking
+Community Mods League of Legends Accounts
+Contact us
+Terms and rules
+Privacy policy
+Help
+Home
+RSS
+Forum software by hoquyettam® © 2010-2020 hoquyettam Ltd. | Style and add-ons by ThemeHouse
+Watch our latest video Practical reverse Engineering 1
+This site uses cookies to personalise content, your experience and to keep you logged in. By using this site, you are con-->
